@@ -1,5 +1,5 @@
 #App Library Backend
-Version 0.1
+Version 0.3.1
 
 #Installation
 Make sure Python is install in the unix based system.

@@ -27,6 +27,6 @@ do
     done
 done
 
-if wget -SO- -T 1 -t 1 https://appdb-pi.egi.eu/ 2>&1 >/dev/null | grep -c 302; then
-    wget https://appdb-pi.egi.eu/rest/1.0/applications?flt=phenomenal -O ../data/appdb.txt
-fi
+# if wget -SO- -T 1 -t 1 https://appdb-pi.egi.eu/ 2>&1 >/dev/null | grep -c 302; then
+#     wget https://appdb-pi.egi.eu/rest/1.0/applications?flt=phenomenal -O ../data/appdb.txt
+# fi

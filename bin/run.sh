@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-path="/usr/share/nginx/html/php-phenomenal-portal-app-library"
+path="/var/www/html/php-phenomenal-portal-app-library"
 markdownFolder="$path/wiki-markdown"
 htmlFolder="$path/wiki-html"
 gitList="$path/conf/gitList.txt"

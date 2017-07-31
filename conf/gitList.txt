@@ -40,9 +40,7 @@ https://github.com/phnmnl/container-mtbls-factors-viz.git
 https://github.com/phnmnl/container-metfrag-cli-batch.git
 https://github.com/phnmnl/container-metfrag-vis.git
 https://github.com/phnmnl/container-MSnbase.git
-https://github.com/phnmnl/container-mtbls-dwnld.git
 https://github.com/phnmnl/container-mzml2metfrag.git
 https://github.com/phnmnl/container-nmrml2isa.git
-https://github.com/phnmnl/container-papy.git
 https://github.com/phnmnl/container-rbase.git
 

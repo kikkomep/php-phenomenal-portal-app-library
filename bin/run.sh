@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-path="/var/www/html/php-phenomenal-portal-app-library"
+path="/usr/share/nginx/html/php-phenomenal-portal-app-library"
 markdownFolder="$path/wiki-markdown"
 htmlFolder="$path/wiki-html"
 gitList="$path/conf/gitList.txt"
@@ -26,7 +26,3 @@ do
       markdown2 --extras fenced-code-blocks "$dir/$file" > "$htmlFolder/$dir/$filename$extension"
     done
 done
-
-# if wget -SO- -T 1 -t 1 https://appdb-pi.egi.eu/ 2>&1 >/dev/null | grep -c 302; then
-#     wget https://appdb-pi.egi.eu/rest/1.0/applications?flt=phenomenal -O ../data/appdb.txt
-# fi

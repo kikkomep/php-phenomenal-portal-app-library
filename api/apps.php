@@ -174,6 +174,8 @@ function getApp($appName){
 
     $readmePath = getPath($appName);
 
+    echo $readmePath;
+
     $html = file_get_html($readmePath);
 
     $title = "";

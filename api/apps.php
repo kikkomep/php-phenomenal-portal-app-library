@@ -12,7 +12,8 @@ error_reporting(E_ERROR | E_PARSE);
  * Time: 16:49
  */
 $path = "../wiki-html";
-   $host = "http://".gethostname()."/php-phenomenal-portal-app-library/";
+// $host = "http://".gethostname()."/php-phenomenal-portal-app-library/";
+$host = "/php-phenomenal-portal-app-library/";
 // $host = "http://phenomenal-h2020.eu/wiki/wiki/app-library-backend/";
 
 switch($_SERVER['REQUEST_METHOD']) {

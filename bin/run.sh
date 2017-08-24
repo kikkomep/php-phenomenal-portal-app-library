@@ -17,6 +17,8 @@ do
     git clone -b master --depth 1 "$line"
 done <"$gitList"
 
+PATH=/usr/local/bin/:$PATH
+
 for dir in `ls ./`;
 do
     for file in `ls ./$dir`;

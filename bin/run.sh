@@ -4,8 +4,18 @@ markdownFolder="$path/wiki-markdown"
 htmlFolder="$path/wiki-html"
 gitList="$path/conf/gitList.txt"
 extension=".html"
+branchConfigFile="$path/conf/branch.config"
 
-source $path/conf/branch.config
+if [ -n "${GIT_BRANCH}" ]; then
+  echo "Setting branch on $branchConfigFile file"
+  echo "export BRANCH=$GIT_BRANCH" > $branchConfigFile
+fi
+
+# Setting the variable and then sourcing it is because cron doesn't get the same env as when this is run
+# directly. First part is triggered when running the first time, sourcing is used in that case and when running 
+# through cron.
+
+source $branchConfigFile
 if [ -z ${BRANCH+x} ]; then
   echo "BRANCH var is unset, setting to default master"
   BRANCH=master

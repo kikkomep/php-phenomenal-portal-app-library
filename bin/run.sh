@@ -41,10 +41,17 @@ PATH=/usr/local/bin/:$PATH
 
 for dir in `ls ./`;
 do
+    mkdir -p "$htmlFolder/$dir"
     for file in `ls ./$dir`;
     do
       filename="${file%.*}"
-      mkdir -p "$htmlFolder/$dir" && markdown2 --extras fenced-code-blocks "$dir/$file" > "$htmlFolder/$dir/$filename"
-      markdown2 --extras fenced-code-blocks "$dir/$file" > "$htmlFolder/$dir/$filename$extension"
+      if [[ $filename =~ (README.*|\.md) ]]; then
+	 echo "Transforming $dir/$file"
+         markdown2 --extras fenced-code-blocks "$dir/$file" > "$htmlFolder/$dir/$filename"
+         cp "$htmlFolder/$dir/$filename" "$htmlFolder/$dir/$filename$extension"
+      else
+	 cp -r "$dir/$file" "$htmlFolder/$dir/$file"
+      fi
+
     done
 done

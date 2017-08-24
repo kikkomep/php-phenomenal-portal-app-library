@@ -5,6 +5,8 @@ htmlFolder="$path/wiki-html"
 gitList="$path/conf/gitList.txt"
 extension=".html"
 
+wget -O $gitList https://raw.githubusercontent.com/phnmnl/portal-settings/master/app-library/gitList.txt
+
 mkdir -p $markdownFolder
 mkdir -p $htmlFolder
 

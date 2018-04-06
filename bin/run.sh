@@ -1,57 +1,25 @@
 #!/usr/bin/env bash
+
+current_path="$( cd "$(dirname "${0}")" ; pwd -P )"
+converter="${current_path}/convert.sh"
+
 path="/var/www/html/php-phenomenal-portal-app-library"
 markdownFolder="$path/wiki-markdown"
 htmlFolder="$path/wiki-html"
-gitList="$path/conf/gitList.txt"
-extension=".html"
-branchConfigFile="$path/conf/branch.config"
+oldHtmlFolder=$(readlink -f ${htmlFolder})
+newHtmlFolder="${htmlFolder}-$(date +%s)"
+gitBranch="master"
+remoteGitList="https://raw.githubusercontent.com/phnmnl/portal-settings/${gitBranch}/app-library/gitList.txt"
 
-if [ -n "${GIT_BRANCH}" ]; then
-  echo "Setting branch on $branchConfigFile file"
-  echo "export BRANCH=$GIT_BRANCH" > $branchConfigFile
-fi
+${converter} \
+    --force-cleanup \
+    --html "${newHtmlFolder}" \
+    --md "${markdownFolder}" \
+    --git-branch "${gitBranch}" \
+    "${remoteGitList}"
 
-# Setting the variable and then sourcing it is because cron doesn't get the same env as when this is run
-# directly. First part is triggered when running the first time, sourcing is used in that case and when running 
-# through cron.
+echo "Linking new folder ${newHtmlFolder}"
+ln -sfn ${newHtmlFolder} ${htmlFolder}
 
-source $branchConfigFile
-if [ -z ${BRANCH+x} ]; then
-  echo "BRANCH var is unset, setting to default master"
-  BRANCH=master
-fi
-
-echo "Using $BRANCH branch for portal settings and README files"
-
-wget -O $gitList https://raw.githubusercontent.com/phnmnl/portal-settings/$BRANCH/app-library/gitList.txt
-
-mkdir -p $markdownFolder
-mkdir -p $htmlFolder
-
-cd $markdownFolder && rm -rf *
-
-echo $gitList
-
-while IFS= read line
-do
-    git clone -b $BRANCH --depth 1 "$line"
-done <"$gitList"
-
-PATH=/usr/local/bin/:$PATH
-
-for dir in `ls ./`;
-do
-    mkdir -p "$htmlFolder/$dir"
-    for file in `ls ./$dir`;
-    do
-      filename="${file%.*}"
-      if [[ $filename =~ (README.*|\.md) ]]; then
-	 echo "Transforming $dir/$file"
-         markdown2 --extras fenced-code-blocks "$dir/$file" > "$htmlFolder/$dir/$filename"
-         cp "$htmlFolder/$dir/$filename" "$htmlFolder/$dir/$filename$extension"
-      else
-	 cp -r "$dir/$file" "$htmlFolder/$dir/$file"
-      fi
-
-    done
-done
+echo "Removing old folder ${oldHtmlFolder}"
+rm -Rf ${oldHtmlFolder}

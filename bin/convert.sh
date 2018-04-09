@@ -183,7 +183,8 @@ do
         fi
         # convert markdown
         convert_markdown "${container_name}"
-
         echo -e "Processing container '$container_name'... DONE" >&2
+        # wait before the next conversion job
+        sleep 5
     fi
 done <"$gitList"

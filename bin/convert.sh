@@ -34,10 +34,14 @@ function convert_markdown(){
     done
 }
 
+# log conversion error
+function handle_conversion_error(){
+    echo "Conversion of the container '${container_name}' failed!" >&2
+}
 
 # print usage
 function print_usage(){
-    echo -e "\nUSAGE: ${0} [--force-cleanup] [--html <PATH>] [--md <PATH>] [--git-branch <BRANCH_NAME>] <REPOSITORIES_LIST_FILE>\n"  >&2
+    echo -e "\nUSAGE: ${0} [--force-cleanup] [--html <PATH>] [--md <PATH>] [--git-branch <BRANCH_NAME>] <REPOSITORIES_LIST_FILE>\n"  
 }
 
 # set defaults
@@ -146,24 +150,20 @@ mkdir -p ${markdownFolder}
 mkdir -p ${htmlFolder}
 
 # log configuration
-echo -e "\n-------------------------------------------------------------------------------------------------------" >&2
-echo -e "*** Tool Configuration *** " >&2
-echo -e "-------------------------------------------------------------------------------------------------------" >&2
-echo "Markdown folder: ${markdownFolder}" >&2
-echo "Html folder: ${htmlFolder}" >&2
-echo "Git Repositories file: ${gitList}" >&2
-echo "Git branch: ${gitBranch}" >&2
-echo -e "-------------------------------------------------------------------------------------------------------" >&2
+echo -e "\n-------------------------------------------------------------------------------------------------------" 
+echo -e "*** Tool Configuration *** " 
+echo -e "-------------------------------------------------------------------------------------------------------" 
+echo "Markdown folder: ${markdownFolder}" 
+echo "Html folder: ${htmlFolder}" 
+echo "Git Repositories file: ${gitList}" 
+echo "Git branch: ${gitBranch}" 
+echo -e "-------------------------------------------------------------------------------------------------------" 
 
 # set markdown folder as working dir
 cd ${markdownFolder}
 
-# cleanup existing git repositories is required
-if [[ ${forceCleanup} = true ]]; then
-    echo "Cleaning existing repositories..." >&2
-    rm -Rf *
-    echo "Cleaning existing repositories... DONE" >&2
-fi
+# set error handler
+trap handle_conversion_error ERR INT
 
 # process list of container repositories
 while IFS= read line
@@ -172,18 +172,18 @@ do
     if [[ ! -z ${line} ]]; then
         # extract the container name
         container_name=$(echo ${line} | sed -e 's/https:\/\/\([^\/]\+\)\/\([^\/]\+\)\/\(.*\)\.git/\3/g')
-        echo -e "\nProcessing container '$container_name'..." >&2
+        echo -e "\nProcessing container '$container_name'..." 
         # if the repository already exists simply update it
         # otherwise it will be cloned
-        if [[ -d ${container_name} ]]; then
-            echo "Updating existing repository..." >&2
+        if [[ -d ${container_name} && ! ${forceCleanup} ]]; then
+            echo "Updating existing repository..." 
             cd ${container_name} && git pull origin ${gitBranch} && cd ..
         else
             git clone -b ${gitBranch} "$line"
         fi
         # convert markdown
         convert_markdown "${container_name}"
-        echo -e "Processing container '$container_name'... DONE" >&2
+        echo -e "Processing container '$container_name'... DONE" 
         # wait before the next conversion job
         sleep 5
     fi

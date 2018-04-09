@@ -19,19 +19,9 @@ if [[ -L ${htmlFolder} ]]; then
     oldHtmlFolder=$(readlink -f ${htmlFolder})
 fi
 
-# clean 'oldHtmlFolder' if it is not a directory
-if [[ ! -z ${oldHtmlFolder} && ! -d ${oldHtmlFolder} ]]; then
-    oldHtmlFolder=""
-fi
-
 # read the old markdown link
 if [[ -L ${markdownFolder} ]]; then
     oldMarkdownFolder=$(readlink -f ${markdownFolder})
-fi
-
-# clean 'oldMarkdownFolder' if it is not a directory
-if [[ ! -z ${oldMarkdownFolder} && ! -d ${oldMarkdownFolder} ]]; then
-    oldMarkdownFolder=""
 fi
 
 # print path info
@@ -56,21 +46,20 @@ ${converter} \
 # check whether there exists the new folder
 if [[ -d ${newHtmlFolder} && -d ${newMarkdownFolder} ]]; then
 
-    echo "Linking new markdown folder ${newMarkdownFolder}"
+    echo -e "\nCreating links to the updated resources..."
+    echo " - Linking new markdown folder ${newMarkdownFolder}"
     ln -sfn ${newMarkdownFolder} ${markdownFolder}
-
-    echo "Linking new html folder ${newHtmlFolder}"
+    echo " - Linking new html folder ${newHtmlFolder}"
     ln -sfn ${newHtmlFolder} ${htmlFolder}
 
-    # remove the old html folder if it exists
+    # cleaning old directories
+    echo -e "\nCleaning old"
     if [[ ! -z ${oldHtmlFolder} && -d ${oldHtmlFolder} ]]; then
-        echo "Removing old folder ${oldHtmlFolder}"
+        echo " - Removing old html folder ${oldHtmlFolder}"
         rm -Rf ${oldHtmlFolder}
     fi
-
-    # remove the old markdown folder if it exists
     if [[ ! -z ${oldMarkdownFolder} && -d ${oldMarkdownFolder} ]]; then
-        echo "Removing old folder ${oldMarkdownFolder}"
+        echo " - Removing old markdown folder ${oldMarkdownFolder}"
         rm -Rf ${oldMarkdownFolder}
     fi
 fi

@@ -126,11 +126,23 @@ if [[ -z ${gitList} ]]; then
     exit -1
 fi
 
+# log configuration
+echo -e "\n-------------------------------------------------------------------------------------------------------"
+echo -e "*** Tool Configuration *** "
+echo -e "-------------------------------------------------------------------------------------------------------"
+echo "Markdown folder: ${markdownFolder}"
+echo "Html folder: ${htmlFolder}"
+echo "Git Repositories file: ${gitList}"
+echo "Git branch: ${gitBranch}"
+echo -e "-------------------------------------------------------------------------------------------------------"
+
 # download the list file if it is a HTTP(s) resource
 if [[ ! -z ${gitList} && ${gitList} =~ ^https?://.+  ]]; then
+    echo -e "Downloading list of repositories..."
     remoteGitList=${gitList}
     gitList="/tmp/remoteGitList.txt"
     wget -O ${gitList} ${remoteGitList}
+    echo "Downloading list of repositories... DONE"
 fi
 
 # Check whether the gitList file exists or not
@@ -142,28 +154,17 @@ fi
 # force absolute paths
 htmlFolder=$(absPath "${htmlFolder}")
 markdownFolder=$(absPath "${markdownFolder}")
-echo "${gitList}"
 gitList=$(absPath "${gitList}")
 
 # create required folder if they don't exist
 mkdir -p ${markdownFolder}
 mkdir -p ${htmlFolder}
 
-# log configuration
-echo -e "\n-------------------------------------------------------------------------------------------------------" 
-echo -e "*** Tool Configuration *** " 
-echo -e "-------------------------------------------------------------------------------------------------------" 
-echo "Markdown folder: ${markdownFolder}" 
-echo "Html folder: ${htmlFolder}" 
-echo "Git Repositories file: ${gitList}" 
-echo "Git branch: ${gitBranch}" 
-echo -e "-------------------------------------------------------------------------------------------------------" 
-
 # set markdown folder as working dir
 cd ${markdownFolder}
 
 # set error handler
-trap handle_conversion_error ERR INT
+trap handle_conversion_error ERR
 
 # process list of container repositories
 while IFS= read line

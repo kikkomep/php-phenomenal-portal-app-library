@@ -179,7 +179,14 @@ do
             echo "Updating existing repository..." 
             cd ${container_name} && git pull origin ${gitBranch} && cd ..
         else
-            git clone -b ${gitBranch} "$line"
+            # cleanup existing git repositories is required
+            if [[ -d ${container_name} ]]; then
+                echo "Cleaning existing repositories..."
+                rm -Rf ${container_name}
+                echo "Cleaning existing repositories... DONE"
+            fi
+            # download the repository
+            git clone --depth 1 -b ${gitBranch} "$line"
         fi
         # convert markdown
         convert_markdown "${container_name}"

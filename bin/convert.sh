@@ -42,10 +42,12 @@ function absPath(){
 
 # convert md files of a git repo into html
 function convert_markdown(){
-    local container_name="${1}"
-    if [[ -d "${htmlFolder}/${container_name}" ]]; then rm -Rf "${htmlFolder}/${container_name}"; fi;
-    mkdir -p "${htmlFolder}/${container_name}";
-    for file in `ls ./${container_name}`;
+    local source_path="${1}"
+    local target_path="${2}"
+    # ensure an empty target folder
+    rm -Rf "${target_path}" && mkdir -p "${target_path}";
+    # perform the conversion of .md files
+    for file in `ls "${source_path}"`;
     do
         file=$(basename "${file}")
         filename="${file%.*}"
@@ -53,7 +55,7 @@ function convert_markdown(){
         if [[ ! -d "${file}" ]] && [[ ${extension} = "md" ]]; then
           echo "Converting ${file} to ${filename}${targetExtension}..."
           markdown2 --extras fenced-code-blocks \
-                    "${container_name}/$file" > "$htmlFolder/${container_name}/${filename}${targetExtension}"
+                    "${source_path}/$file" > "${target_path}/${filename}${targetExtension}"
       fi
     done
 }
@@ -204,7 +206,7 @@ do
             git clone --depth 1 -b "${gitBranch}" "$line"
         fi
         # convert markdown
-        convert_markdown "${container_name}"
+        convert_markdown "./${container_name}" "${htmlFolder}/${container_name}"
         echo -e "Processing container '$container_name'... DONE" 
         # wait before the next conversion job
         sleep 5

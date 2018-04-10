@@ -19,7 +19,7 @@ function absPath(){
 # convert md files of a git repo into html
 function convert_markdown(){
     local container_name="${1}"
-    if [[ -d ${htmlFolder}/${container_name} ]]; then rm -Rf ${htmlFolder}/${container_name}; fi;
+    if [[ -d "${htmlFolder}/${container_name}" ]]; then rm -Rf "${htmlFolder}/${container_name}"; fi;
     mkdir -p "${htmlFolder}/${container_name}";
     for file in `ls ./${container_name}`;
     do
@@ -121,7 +121,7 @@ done
 gitList=$(echo "${OTHER_OPTS//[[:space:]]/}")
 
 # check whether gitList parameter has been provided
-if [[ -z ${gitList} ]]; then
+if [[ -z "${gitList}" ]]; then
     echo -e "\nYou need to provide the <REPOSITORIES_LIST_FILE> !!!\n"
     exit -1
 fi
@@ -137,16 +137,16 @@ echo "Git branch: ${gitBranch}"
 echo -e "-------------------------------------------------------------------------------------------------------"
 
 # download the list file if it is a HTTP(s) resource
-if [[ ! -z ${gitList} && ${gitList} =~ ^https?://.+  ]]; then
+if [[ ! -z "${gitList}" && "${gitList}" =~ ^https?://.+  ]]; then
     echo -e "Downloading list of repositories..."
-    remoteGitList=${gitList}
+    remoteGitList="${gitList}"
     gitList="/tmp/remoteGitList.txt"
-    wget -O ${gitList} ${remoteGitList}
+    wget -O "${gitList}" "${remoteGitList}"
     echo "Downloading list of repositories... DONE"
 fi
 
 # Check whether the gitList file exists or not
-if [[ ! -f ${gitList} ]]; then
+if [[ ! -f "${gitList}" ]]; then
     echo "GitList file '${gitList}' doesn't exist!!!"
     exit -1
 fi
@@ -157,11 +157,11 @@ markdownFolder=$(absPath "${markdownFolder}")
 gitList=$(absPath "${gitList}")
 
 # create required folder if they don't exist
-mkdir -p ${markdownFolder}
-mkdir -p ${htmlFolder}
+mkdir -p "${markdownFolder}"
+mkdir -p "${htmlFolder}"
 
 # set markdown folder as working dir
-cd ${markdownFolder}
+cd "${markdownFolder}"
 
 # set error handler
 trap handle_conversion_error ERR
@@ -176,18 +176,18 @@ do
         echo -e "\nProcessing container '$container_name'..." 
         # if the repository already exists simply update it
         # otherwise it will be cloned
-        if [[ -d ${container_name} && ! ${forceCleanup} ]]; then
+        if [[ -d "${container_name}" && ! ${forceCleanup} ]]; then
             echo "Updating existing repository..." 
-            cd ${container_name} && git pull origin ${gitBranch} && cd ..
+            cd "${container_name}" && git pull origin "${gitBranch}" && cd ..
         else
             # cleanup existing git repositories is required
-            if [[ -d ${container_name} ]]; then
+            if [[ -d "${container_name}" ]]; then
                 echo "Cleaning existing repositories..."
-                rm -Rf ${container_name}
+                rm -Rf "${container_name}"
                 echo "Cleaning existing repositories... DONE"
             fi
             # download the repository
-            git clone --depth 1 -b ${gitBranch} "$line"
+            git clone --depth 1 -b "${gitBranch}" "$line"
         fi
         # convert markdown
         convert_markdown "${container_name}"

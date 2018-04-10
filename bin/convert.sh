@@ -1,5 +1,33 @@
 #!/usr/bin/env bash
 
+set -o errexit
+
+function log() {
+  echo -e "$(date +"%F %T") [${BASH_SOURCE}] -- $@" >&2
+}
+
+
+function on_error(){
+    log "Error at line ${BASH_LINENO[0]} running command ${BASH_COMMAND}"
+    if [[ ! -z ${container_name} ]]; then
+        log "Conversion of the container '${container_name}' failed!"
+    fi
+}
+
+
+function on_exit(){
+    # remove downloaded list of repositories
+    if [[ ! -z "${remoteGitList}" ]]; then
+        echo -e "\nCleaning: removing temp list of repositories..."
+        rm ${gitList}
+    fi
+}
+
+# set error handler
+trap on_error ERR
+
+# log exit handler
+trap on_exit EXIT
 
 # compute an absolute path
 function absPath(){
@@ -28,11 +56,6 @@ function convert_markdown(){
                     "${container_name}/$file" > "$htmlFolder/${container_name}/${filename}${targetExtension}"
       fi
     done
-}
-
-# log conversion error
-function handle_conversion_error(){
-    echo "Conversion of the container '${container_name}' failed!" >&2
 }
 
 # print usage
@@ -156,9 +179,6 @@ mkdir -p "${htmlFolder}"
 
 # set markdown folder as working dir
 cd "${markdownFolder}"
-
-# set error handler
-trap handle_conversion_error ERR
 
 # process list of container repositories
 while IFS= read line

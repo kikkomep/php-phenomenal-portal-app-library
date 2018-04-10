@@ -159,7 +159,7 @@ echo -e "-----------------------------------------------------------------------
 if [[ ! -z "${gitList}" && "${gitList}" =~ ^https?://.+  ]]; then
     echo -e "Downloading list of repositories..."
     remoteGitList="${gitList}"
-    gitList="/tmp/remoteGitList.txt"
+    gitList=$(mktemp)
     wget -O "${gitList}" "${remoteGitList}"
     echo "Downloading list of repositories... DONE"
 fi

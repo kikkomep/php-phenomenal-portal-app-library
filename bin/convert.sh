@@ -229,7 +229,7 @@ do
             # cleanup existing git repositories is required
             if [[ -d "${container_name}" ]]; then
                 echo "Cleaning existing repositories..."
-                rm -Rf "${container_name}"
+                rm -Rf "./${container_name}"
                 echo "Cleaning existing repositories... DONE"
             fi
             # download the repository

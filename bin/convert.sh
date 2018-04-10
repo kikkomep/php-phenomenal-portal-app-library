@@ -2,9 +2,6 @@
 
 set -o nounset
 
-# path of the markdown2 utility
-markdown2="/usr/local/bin/markdown2"
-
 # compute an absolute path
 function absPath(){
     if [[ -d "$1" ]]; then
@@ -28,7 +25,7 @@ function convert_markdown(){
         extension="${file##*.}"
         if [[ ! -d "${file}" ]] && [[ ${extension} = "md" ]]; then
           echo "Converting ${file} to ${filename}${targetExtension}..."
-          ${markdown2} --extras fenced-code-blocks \
+          markdown2 --extras fenced-code-blocks \
                     "${container_name}/$file" > "$htmlFolder/${container_name}/${filename}${targetExtension}"
       fi
     done

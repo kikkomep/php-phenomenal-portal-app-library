@@ -23,13 +23,6 @@ function remove_old_folders(){
     fi
 }
 
-function remove_tmp_folders(){
-    if [[ -d "${newHtmlFolder}" || -d "${newMarkdownFolder}" ]]; then
-        echo -e "\nCleaning: removing temporary folders..."
-        remove_folder "tmp html" ${newHtmlFolder}
-        remove_folder "tmp markdown" ${newMarkdownFolder}
-    fi
-}
 
 function update_links(){
     # check whether there exists the new folder (redundant)
@@ -44,7 +37,6 @@ function update_links(){
 
 
 function on_interrupt(){
-    echo "Interrupt code_: ${1}"
     interrupt_code="${1}"
 }
 
@@ -57,12 +49,10 @@ function on_exit(){
     # cleanup temp folders if the process is interrupted
     if [[ ! -z ${interrupt_code} ]]; then
         log "Interrupted by signal ${1}"
-        remove_tmp_folders
         exit 130
     fi
     # cleanup temp folders if the process fails and notify the error code
     if [[ -z ${converter_exit_code} || ${converter_exit_code} -ne 0 ]]; then
-        remove_tmp_folders
         exit 99
     fi
     # update links and remove old resources

@@ -6,16 +6,16 @@ function log() {
   echo -e "$(date +"%F %T") [${BASH_SOURCE}] -- $@" >&2
 }
 
-
-function on_error(){
-    log "Error at line ${BASH_LINENO[0]} running command ${BASH_COMMAND}"
-    if [[ ! -z ${container_name} ]]; then
-        log "Conversion of the container '${container_name}' failed!"
+function delete_folder(){
+    local type=${1}
+    local path=${2}
+    if [[ ! -z "${path}" && -d "${path}" ]]; then
+        echo " - Removing ${type} folder ${path}"
+        rm -Rf "${path}"
     fi
 }
 
-
-function on_exit(){
+function delete_remote_git_list(){
     # remove downloaded list of repositories
     if [[ ! -z "${remoteGitList}" ]]; then
         echo -e "\nCleaning: removing temp list of repositories..."
@@ -23,8 +23,38 @@ function on_exit(){
     fi
 }
 
+function delete_created_folders(){
+    if [[ -d "${htmlFolder}" || -d "${markdownFolder}" ]]; then
+        echo -e "\nCleaning: removing created folders..."
+        delete_folder "html" ${htmlFolder}
+        delete_folder "markdown" ${markdownFolder}
+    fi
+}
+
+function on_error(){
+    log "Error at line ${BASH_LINENO[0]} running command ${BASH_COMMAND}"
+    if [[ ! -z ${container_name} ]]; then
+        log "Conversion of the container '${container_name}' failed!"
+    fi
+    # cleanup
+    delete_created_folders
+}
+
+function on_interrupt(){
+    # cleanup
+    delete_created_folders
+}
+
+
+function on_exit(){
+    delete_remote_git_list
+}
+
 # set error handler
 trap on_error ERR
+
+# set interrupt handler
+trap on_interrupt INT TERM
 
 # log exit handler
 trap on_exit EXIT

@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 
-set -o nounset
 
 # compute an absolute path
 function absPath(){
@@ -49,16 +48,20 @@ gitBranch="master"
 targetExtension=".html"
 forceCleanup=false
 
+# Collect arguments to be passed on to the next program in an array, rather than
+# a simple string. This choice lets us deal with arguments that contain spaces.
+ARGS=()
+
 # parse arguments
-OTHER_OPTS=''
-while [ $# -gt 0 ]; do
+while [ -n "$1" ]; do
     # Copy so we can modify it (can't modify $1)
     OPT="$1"
     # Detect argument termination
     if [ x"$OPT" = x"--" ]; then
             shift
             for OPT ; do
-                    OTHER_OPTS="$OTHER_OPTS \"$OPT\""
+                    # append to array
+                    ARGS+=("$OPT")
             done
             break
     fi
@@ -97,25 +100,19 @@ while [ $# -gt 0 ]; do
                           shift
                           ;;
                   * )
-                          OTHER_OPTS="$OTHER_OPTS $OPT"
+                          # append to array
+                          ARGS+=("$OPT")
                           break
                           ;;
             esac
-            # Check for multiple short options
-            # NOTICE: be sure to update this pattern to match valid options
-            NEXTOPT="${OPT#-[cfr]}" # try removing single short opt
-            if [ x"$OPT" != x"$NEXTOPT" ] ; then
-                    OPT="-$NEXTOPT"  # multiple short opts, keep going
-            else
-                    break  # long form, exit inner loop
-            fi
+            break
     done
     # move to the next param
     shift
 done
 
 # set and trim the REPOSITORIES_LIST_PARAMETER containing the list of git repositories
-gitList=$(echo "${OTHER_OPTS//[[:space:]]/}")
+gitList=$(echo "${ARGS//[[:space:]]/}")
 
 # check whether gitList parameter has been provided
 if [[ -z "${gitList}" ]]; then

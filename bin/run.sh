@@ -86,13 +86,18 @@ path="/var/www/html/php-phenomenal-portal-app-library"
 htmlFolder="$path/wiki-html"
 markdownFolder="$path/wiki-markdown"
 remoteGitList="https://raw.githubusercontent.com/phnmnl/portal-settings/master/app-library/gitList.txt"
-remoteGitList="/tmp/remoteGitList.txt"
 gitBranch="master"
 
 # set directories to host new files
 timestamp="$(date +%s)"
 newHtmlFolder="${htmlFolder}-${timestamp}"
 newMarkdownFolder="${markdownFolder}-${timestamp}"
+oldHtmlFolder=""
+oldMarkdownFolder=""
+
+# aux variables
+interrupt_code=""
+converter_exit_code=""
 
 # read the old html link
 if [[ -L "${htmlFolder}" ]]; then

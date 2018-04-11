@@ -100,6 +100,7 @@ markdownFolder="wiki-markdown"
 htmlFolder="wiki-html"
 gitList="conf/gitList.txt"
 gitBranch="master"
+remoteGitList=""
 targetExtension=".html"
 forceCleanup=false
 waitBetweenRepos=5 # seconds
@@ -109,7 +110,7 @@ waitBetweenRepos=5 # seconds
 ARGS=()
 
 # parse arguments
-while [ -n "$1" ]; do
+while [ "$#" -gt 0 ]; do
     # Copy so we can modify it (can't modify $1)
     OPT="$1"
     # Detect argument termination

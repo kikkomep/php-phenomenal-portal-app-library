@@ -63,11 +63,9 @@ trap on_exit EXIT
 # compute an absolute path
 function absPath(){
     if [[ -d "$1" ]]; then
-        cd "$1"
-        echo "$(pwd -P)"
+      (cd "$1" && echo "$(pwd -P)")
     else
-        cd "$(dirname "$1")"
-        echo "$(pwd -P)/$(basename "$1")"
+      (cd "$(dirname "$1")" && echo "$(pwd -P)/$(basename "$1")")
     fi
 }
 

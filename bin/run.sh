@@ -38,7 +38,7 @@ function update_links(){
 
 
 function on_interrupt(){
-    interrupt_code="${1}"
+    interrupted="true"
 }
 
 function on_error(){
@@ -48,8 +48,8 @@ function on_error(){
 
 function on_exit(){
     # cleanup temp folders if the process is interrupted
-    if [[ ! -z ${interrupt_code} ]]; then
-        log "Interrupted by signal ${1}"
+    if [[ ! -z ${interrupted} ]]; then
+        log "Interrupted by signal (SIGINT/SIGTERM)"
         exit 130
     fi
     # cleanup temp folders if the process fails and notify the error code
@@ -96,7 +96,7 @@ oldHtmlFolder=""
 oldMarkdownFolder=""
 
 # aux variables
-interrupt_code=""
+interrupted=""
 converter_exit_code=""
 
 # read the old html link

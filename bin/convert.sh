@@ -10,7 +10,7 @@ function delete_folder(){
     local type=${1}
     local path=${2}
     if [[ ! -z "${path}" && -d "${path}" ]]; then
-        echo " - Removing ${type} folder ${path}"
+        log " - Removing ${type} folder ${path}"
         rm -Rf "${path}"
     fi
 }
@@ -18,14 +18,14 @@ function delete_folder(){
 function delete_remote_git_list(){
     # remove downloaded list of repositories
     if [[ ! -z "${remoteGitList}" ]]; then
-        echo -e "\nCleaning: removing temp list of repositories..."
+        log "\nCleaning: removing temp list of repositories..."
         rm ${gitList}
     fi
 }
 
 function delete_created_folders(){
     if [[ -d "${htmlFolder}" || -d "${markdownFolder}" ]]; then
-        echo -e "\nCleaning: removing created folders..."
+        log "\nCleaning: removing created folders..."
         delete_folder "html" ${htmlFolder}
         delete_folder "markdown" ${markdownFolder}
     fi
@@ -83,8 +83,8 @@ function convert_markdown(){
         filename="${file%.*}"
         extension="${file##*.}"
         if [[ ! -d "${file}" ]] && [[ ${extension} = "md" ]]; then
-          echo "Converting ${file} to ${filename}${targetExtension}..."
-          markdown2 --extras fenced-code-blocks \
+          log "Converting ${file} to ${filename}${targetExtension}..."
+          "${markdownExecutable}" --extras fenced-code-blocks \
                     "${source_path}/$file" > "${target_path}/${filename}${targetExtension}"
       fi
     done
@@ -92,10 +92,11 @@ function convert_markdown(){
 
 # print usage
 function print_usage(){
-    echo -e "\nUSAGE: ${0} [--force-cleanup] [--html <PATH>] [--md <PATH>] [--git-branch <BRANCH_NAME>] <REPOSITORIES_LIST_FILE>\n"  
+    echo -e "\nUSAGE: ${0} [--force-cleanup] [--html <PATH>] [--md <PATH>] [--git-branch <BRANCH_NAME>] <REPOSITORIES_LIST_FILE>\n"  >&2
 }
 
 # set defaults
+markdownExecutable="markdown2"
 markdownFolder="wiki-markdown"
 htmlFolder="wiki-html"
 gitList="conf/gitList.txt"
@@ -167,37 +168,37 @@ while [ -n "$1" ]; do
 done
 
 # set and trim the REPOSITORIES_LIST_PARAMETER containing the list of git repositories
-gitList=$(echo "${ARGS//[[:space:]]/}")
+gitList="${ARGS//[[:space:]]/}"
 
 # check whether gitList parameter has been provided
 if [[ -z "${gitList}" ]]; then
-    echo -e "\nYou need to provide the <REPOSITORIES_LIST_FILE> !!!\n"
-    exit -1
+    echo -e "\nYou need to provide the <REPOSITORIES_LIST_FILE> !!!\n" >&2
+    exit 2
 fi
 
 # log configuration
-echo -e "\n-------------------------------------------------------------------------------------------------------"
+(echo -e "\n-------------------------------------------------------------------------------------------------------"
 echo -e "*** Tool Configuration *** "
 echo -e "-------------------------------------------------------------------------------------------------------"
 echo "Markdown folder: ${markdownFolder}"
 echo "Html folder: ${htmlFolder}"
 echo "Git Repositories file: ${gitList}"
 echo "Git branch: ${gitBranch}"
-echo -e "-------------------------------------------------------------------------------------------------------"
+echo -e "-------------------------------------------------------------------------------------------------------") >&2
 
 # download the list file if it is a HTTP(s) resource
 if [[ ! -z "${gitList}" && "${gitList}" =~ ^https?://.+  ]]; then
-    echo -e "Downloading list of repositories..."
+    log "Downloading list of repositories..."
     remoteGitList="${gitList}"
     gitList=$(mktemp)
     wget -O "${gitList}" "${remoteGitList}"
-    echo "Downloading list of repositories... DONE"
+    log "Downloading list of repositories... DONE"
 fi
 
 # Check whether the gitList file exists or not
 if [[ ! -f "${gitList}" ]]; then
-    echo "GitList file '${gitList}' doesn't exist!!!"
-    exit -1
+    log "GitList file '${gitList}' doesn't exist!!!"
+    exit 2
 fi
 
 # force absolute paths
@@ -219,25 +220,26 @@ do
     if [[ ! -z ${line} ]]; then
         # extract the container name
         container_name=$(echo ${line} | sed -e 's/https:\/\/\([^\/]\+\)\/\([^\/]\+\)\/\(.*\)\.git/\3/g')
-        echo -e "\nProcessing container '$container_name'..." 
+        log "----"
+        log "Processing container '$container_name'..."
         # if the repository already exists simply update it
         # otherwise it will be cloned
         if [[ -d "${container_name}" && ! ${forceCleanup} ]]; then
-            echo "Updating existing repository..." 
+            log "Updating existing repository..."
             cd "${container_name}" && git pull origin "${gitBranch}" && cd ..
         else
             # cleanup existing git repositories is required
             if [[ -d "${container_name}" ]]; then
-                echo "Cleaning existing repositories..."
+                log "Cleaning existing repositories..."
                 rm -Rf "./${container_name}"
-                echo "Cleaning existing repositories... DONE"
+                log "Cleaning existing repositories... DONE"
             fi
             # download the repository
             git clone --depth 1 -b "${gitBranch}" "$line"
         fi
         # convert markdown
         convert_markdown "./${container_name}" "${htmlFolder}/${container_name}"
-        echo -e "Processing container '$container_name'... DONE" 
+        log "Processing container '$container_name'... DONE"
         # wait before the next conversion job
         sleep 5
     fi

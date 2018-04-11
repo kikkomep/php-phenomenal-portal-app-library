@@ -10,14 +10,14 @@ function remove_folder(){
     local type=${1}
     local path=${2}
     if [[ ! -z "${path}" && -d "${path}" ]]; then
-        echo " - Removing ${type} folder ${path}"
+        log " - Removing ${type} folder ${path}"
         rm -Rf "${path}"
     fi
 }
 
 function remove_old_folders(){
     if [[ -d "${oldHtmlFolder}" || -d "${oldMarkdownFolder}" ]]; then
-        echo -e "\nCleaning: removing old folders..."
+        log "\nCleaning: removing old folders..."
         remove_folder "old html" ${oldHtmlFolder}
         remove_folder "old markdown" ${oldMarkdownFolder}
     fi
@@ -27,10 +27,10 @@ function remove_old_folders(){
 function update_links(){
     # check whether there exists the new folder (redundant)
     if [[ -d "${newHtmlFolder}" && -d "${newMarkdownFolder}" ]]; then
-        echo -e "\nCreating links to the updated resources..."
-        echo " - Linking new markdown folder ${newMarkdownFolder}"
+        log "\nCreating links to the updated resources..."
+        log " - Linking new markdown folder ${newMarkdownFolder}"
         ln -sfn "${newMarkdownFolder}" "${markdownFolder}"
-        echo " - Linking new html folder ${newHtmlFolder}"
+        log " - Linking new html folder ${newHtmlFolder}"
         ln -sfn "${newHtmlFolder}" "${htmlFolder}"
     fi
 }
@@ -99,14 +99,14 @@ if [[ -L "${markdownFolder}" ]]; then
 fi
 
 # print path info
-echo "Script path: ${current_path}"
+(echo "Script path: ${current_path}"
 echo "Target base path: ${path}"
 echo "Html Folder [New]: ${newHtmlFolder}"
 echo "Html Folder [Old]: ${oldHtmlFolder}"
 echo "Html Folder [Link]: ${htmlFolder}"
 echo "Markdown Folder [New]: ${newMarkdownFolder}"
 echo "Markdown Folder [Old]: ${oldMarkdownFolder}"
-echo "Markdown Folder [Link]: ${markdownFolder}"
+echo "Markdown Folder [Link]: ${markdownFolder}") >&2
 
 # start conversion
 ${converter} \
@@ -117,5 +117,5 @@ ${converter} \
     "${remoteGitList}"
 
 # get the converter exit code
-converter_exit_code=$?
-echo "Converter exit code: ${converter_exit_code}"
+converter_exit_code=$? # This will always be zero as long as errexit is enabled
+log "Converter exit code: ${converter_exit_code}"

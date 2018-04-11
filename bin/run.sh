@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+set -o nounset
 set -o errexit
 
 function log() {
@@ -7,8 +8,8 @@ function log() {
 }
 
 function remove_folder(){
-    local type=${1}
-    local path=${2}
+    local type="${1}"
+    local path="${2}"
     if [[ ! -z "${path}" && -d "${path}" ]]; then
         log " - Removing ${type} folder ${path}"
         rm -Rf "${path}"
@@ -74,6 +75,11 @@ trap on_exit EXIT
 # base paths
 current_path="$( cd "$(dirname "${0}")" ; pwd -P )"
 converter="${current_path}/convert.sh"
+
+if [[ ! -x "${converter}" ]]; then
+    log "ERROR! Either the converter script ${converter} isn't present or it's not executable"
+    exit 2
+fi
 
 # global settings
 path="/var/www/html/php-phenomenal-portal-app-library"

@@ -1,14 +1,15 @@
 #!/usr/bin/env bash
 
+set -o nounset
 set -o errexit
 
 function log() {
   echo -e "$(date +"%F %T") [${BASH_SOURCE}] -- $@" >&2
 }
 
-function delete_folder(){
-    local type=${1}
-    local path=${2}
+function delete_folder() {
+    local type="${1}"
+    local path="${2}"
     if [[ ! -z "${path}" && -d "${path}" ]]; then
         log " - Removing ${type} folder ${path}"
         rm -Rf "${path}"
@@ -75,7 +76,7 @@ function convert_markdown(){
     local source_path="${1}"
     local target_path="${2}"
     # ensure an empty target folder
-    rm -Rf "${target_path}" && mkdir -p "${target_path}";
+    rm -Rf "${target_path}" && mkdir -p "${target_path}"
     # perform the conversion of .md files
     for file in `ls "${source_path}"`;
     do
@@ -103,6 +104,7 @@ gitList="conf/gitList.txt"
 gitBranch="master"
 targetExtension=".html"
 forceCleanup=false
+waitBetweenRepos=5 # seconds
 
 # Collect arguments to be passed on to the next program in an array, rather than
 # a simple string. This choice lets us deal with arguments that contain spaces.
@@ -241,6 +243,6 @@ do
         convert_markdown "./${container_name}" "${htmlFolder}/${container_name}"
         log "Processing container '$container_name'... DONE"
         # wait before the next conversion job
-        sleep 5
+        sleep ${waitBetweenRepos}
     fi
 done <"$gitList"

@@ -129,4 +129,3 @@ ${converter} \
 
 # get the converter exit code
 converter_exit_code=$? # This will always be zero as long as errexit is enabled
-log "Converter exit code: ${converter_exit_code}"

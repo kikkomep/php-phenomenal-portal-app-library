@@ -1,57 +1,131 @@
 #!/usr/bin/env bash
+
+set -o nounset
+set -o errexit
+
+function log() {
+  echo -e "$(date +"%F %T") [${BASH_SOURCE}] -- $@" >&2
+}
+
+function remove_folder(){
+    local type="${1}"
+    local path="${2}"
+    if [[ ! -z "${path}" && -d "${path}" ]]; then
+        log " - Removing ${type} folder ${path}"
+        rm -Rf "${path}"
+    fi
+}
+
+function remove_old_folders(){
+    if [[ -d "${oldHtmlFolder}" || -d "${oldMarkdownFolder}" ]]; then
+        log "\nCleaning: removing old folders..."
+        remove_folder "old html" ${oldHtmlFolder}
+        remove_folder "old markdown" ${oldMarkdownFolder}
+    fi
+}
+
+
+function update_links(){
+    # check whether there exists the new folder (redundant)
+    if [[ -d "${newHtmlFolder}" && -d "${newMarkdownFolder}" ]]; then
+        log "\nCreating links to the updated resources..."
+        log " - Linking new markdown folder ${newMarkdownFolder}"
+        ln -sfn "${newMarkdownFolder}" "${markdownFolder}"
+        log " - Linking new html folder ${newHtmlFolder}"
+        ln -sfn "${newHtmlFolder}" "${htmlFolder}"
+    fi
+}
+
+
+function on_interrupt(){
+    interrupted="true"
+}
+
+function on_error(){
+    log "Error at line ${BASH_LINENO[0]} running command ${BASH_COMMAND}"
+}
+
+
+function on_exit(){
+    # cleanup temp folders if the process is interrupted
+    if [[ ! -z ${interrupted} ]]; then
+        log "Interrupted by signal (SIGINT/SIGTERM)"
+        exit 130
+    fi
+    # cleanup temp folders if the process fails and notify the error code
+    if [[ -z ${converter_exit_code} || ${converter_exit_code} -ne 0 ]]; then
+        exit 99
+    fi
+    # update links and remove old resources
+    # if the conversion process is OK
+    update_links
+    remove_old_folders
+    exit 0
+}
+
+# cleanup temporary data if the process fails
+trap on_error ERR
+
+# cleanup temporary data if the process is interrupted
+trap on_interrupt INT TERM
+
+# register handler to finalize results on exit
+trap on_exit EXIT
+
+# base paths
+current_path="$( cd "$(dirname "${0}")" ; pwd -P )"
+converter="${current_path}/convert.sh"
+
+if [[ ! -x "${converter}" ]]; then
+    log "ERROR! Either the converter script ${converter} isn't present or it's not executable"
+    exit 2
+fi
+
+# global settings
 path="/var/www/html/php-phenomenal-portal-app-library"
-markdownFolder="$path/wiki-markdown"
 htmlFolder="$path/wiki-html"
-gitList="$path/conf/gitList.txt"
-extension=".html"
-branchConfigFile="$path/conf/branch.config"
+markdownFolder="$path/wiki-markdown"
+remoteGitList="https://raw.githubusercontent.com/phnmnl/portal-settings/master/app-library/gitList.txt"
+gitBranch="master"
 
-if [ -n "${GIT_BRANCH}" ]; then
-  echo "Setting branch on $branchConfigFile file"
-  echo "export BRANCH=$GIT_BRANCH" > $branchConfigFile
+# set directories to host new files
+timestamp="$(date +%s)"
+newHtmlFolder="${htmlFolder}-${timestamp}"
+newMarkdownFolder="${markdownFolder}-${timestamp}"
+oldHtmlFolder=""
+oldMarkdownFolder=""
+
+# aux variables
+interrupted=""
+converter_exit_code=""
+
+# read the old html link
+if [[ -L "${htmlFolder}" ]]; then
+    oldHtmlFolder=$(readlink -f "${htmlFolder}")
 fi
 
-# Setting the variable and then sourcing it is because cron doesn't get the same env as when this is run
-# directly. First part is triggered when running the first time, sourcing is used in that case and when running 
-# through cron.
-
-source $branchConfigFile
-if [ -z ${BRANCH+x} ]; then
-  echo "BRANCH var is unset, setting to default master"
-  BRANCH=master
+# read the old markdown link
+if [[ -L "${markdownFolder}" ]]; then
+    oldMarkdownFolder=$(readlink -f "${markdownFolder}")
 fi
 
-echo "Using $BRANCH branch for portal settings and README files"
+# print path info
+(echo "Script path: ${current_path}"
+echo "Target base path: ${path}"
+echo "Html Folder [New]: ${newHtmlFolder}"
+echo "Html Folder [Old]: ${oldHtmlFolder}"
+echo "Html Folder [Link]: ${htmlFolder}"
+echo "Markdown Folder [New]: ${newMarkdownFolder}"
+echo "Markdown Folder [Old]: ${oldMarkdownFolder}"
+echo "Markdown Folder [Link]: ${markdownFolder}") >&2
 
-wget -O $gitList https://raw.githubusercontent.com/phnmnl/portal-settings/$BRANCH/app-library/gitList.txt
+# start conversion
+${converter} \
+    --force-cleanup \
+    --html "${newHtmlFolder}" \
+    --md "${newMarkdownFolder}" \
+    --git-branch "${gitBranch}" \
+    "${remoteGitList}"
 
-mkdir -p $markdownFolder
-mkdir -p $htmlFolder
-
-cd $markdownFolder && rm -rf *
-
-echo $gitList
-
-while IFS= read line
-do
-    git clone -b $BRANCH --depth 1 "$line"
-done <"$gitList"
-
-PATH=/usr/local/bin/:$PATH
-
-for dir in `ls ./`;
-do
-    mkdir -p "$htmlFolder/$dir"
-    for file in `ls ./$dir`;
-    do
-      filename="${file%.*}"
-      if [[ $filename =~ (README.*|\.md) ]]; then
-	 echo "Transforming $dir/$file"
-         markdown2 --extras fenced-code-blocks "$dir/$file" > "$htmlFolder/$dir/$filename"
-         cp "$htmlFolder/$dir/$filename" "$htmlFolder/$dir/$filename$extension"
-      else
-	 cp -r "$dir/$file" "$htmlFolder/$dir/$file"
-      fi
-
-    done
-done
+# get the converter exit code
+converter_exit_code=$? # This will always be zero as long as errexit is enabled

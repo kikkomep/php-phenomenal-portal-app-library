@@ -1,5 +1,5 @@
 #App Library Backend
-Version 0.3.1
+Version 0.4.0
 
 #Installation
 Make sure Python is install in the unix based system.
@@ -23,6 +23,9 @@ Setting permission of `bin` `conf` to be 644, other folders can be set as 755
 ## Note
 
 If crontab is used, the absolute location of markdown2 needs to be specified
+
+#Updates v0.4.0
+Add new script to convert markdown to HTML
 
 ##Updates v0.3.1
 Improve bash

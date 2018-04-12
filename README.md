@@ -21,8 +21,14 @@ Setting permission of `bin` `conf` to be 644, other folders can be set as 755
 `path` in `bin` needs to be set.
 
 ## Note
+* This repository uses a Git submodule. To easily initialize and update 
+the submodule pass the option `--recurse-submodules` 
+to the `git clone` command.
 
-If crontab is used, the absolute location of markdown2 needs to be specified
+* If crontab is used, the absolute location of markdown2 needs to be specified
+
+#Updates v0.4.1
+Integrate `markdown2html` as a conversion tool 
 
 #Updates v0.4.0
 Add new script to convert markdown to HTML

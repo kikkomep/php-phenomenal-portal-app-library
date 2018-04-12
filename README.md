@@ -1,7 +1,7 @@
-#App Library Backend
+# App Library Backend
 Version 0.4.1
 
-#Installation
+## Installation
 Make sure Python is install in the unix based system.
 
 Install markdown 2
@@ -20,28 +20,31 @@ Setting permission of `bin` `conf` to be 644, other folders can be set as 755
 
 `path` in `bin` needs to be set.
 
-## Note
+## Notes
+
 * This repository uses a Git submodule. To easily initialize and update 
 the submodule pass the option `--recurse-submodules` 
 to the `git clone` command.
 
 * If crontab is used, the absolute location of markdown2 needs to be specified
 
-#Updates v0.4.1
+## Changelog
+
+##### Updates v0.4.1
 Integrate `markdown2html` as a conversion tool 
 
-#Updates v0.4.0
+##### Updates v0.4.0
 Add new script to convert markdown to HTML
 
-##Updates v0.3.1
+##### Updates v0.3.1
 Improve bash
 Add full text search
 
-##Updates v0.2.2
+##### Updates v0.2.2
 Add query string to redirect pages
 
-##Updates v0.2.1
+##### Updates v0.2.1
 Production version
 
-##Updates v0.2
+##### Updates v0.2
 Data can be pulled across and displayed

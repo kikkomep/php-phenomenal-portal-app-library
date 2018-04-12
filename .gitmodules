@@ -1,0 +1,3 @@
+[submodule "bin/markdown2html"]
+	path = bin/markdown2html
+	url = https://github.com/phnmnl/markdown2html.git

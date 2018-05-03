@@ -1,10 +1,6 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: sijinhe
- * Date: 12/10/2016
- * Time: 16:03
- */
+
+
 function getAllAppDBId(){
     $html = file_get_html('../data/appdb.txt');
 
@@ -54,10 +50,3 @@ function getAppDBApp($id){
 
     return $item;
 }
-
-
-
-
-
-
-?>

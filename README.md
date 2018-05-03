@@ -1,5 +1,5 @@
 # App Library Backend
-Version 0.4.1
+Version 0.4.2
 
 ## Installation
 Make sure Python is install in the unix based system.
@@ -29,6 +29,9 @@ to the `git clone` command.
 * If crontab is used, the absolute location of markdown2 needs to be specified
 
 ## Changelog
+
+##### Updates v0.4.2
+Update search functions to implement conjunctive queries
 
 ##### Updates v0.4.1
 Integrate `markdown2html` as a conversion tool 

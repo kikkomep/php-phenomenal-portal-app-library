@@ -65,37 +65,38 @@ function getAllApp()
     echo json_encode($json);
 }
 
-function getAppWithTechnology($technology, $approaches, $instrument) {
+
+function getAppWithTechnology($technology, $approaches, $instrument)
+{
     global $path;
-
-    $dir = $path;
-
-    $data = getFilenames($dir, '');
+    $data = getFilenames($path, '');
 
     $json = [];
-
     $json['result'] = 1;
     $json['data'] = [];
-
-    foreach ($data['data'] as $appName){
+    foreach ($data['data'] as $appName) {
 
         $appName = substr($appName, 10); //always prefix with 'container-'
-        if(file_exists(getPath($appName))) {
+        if (file_exists(getPath($appName))) {
             $app = getApp($appName);
 
-            $server1 = array_unique($app['functionality']);
-            $server2 = array_unique($app['approaches']);
-            $server3 = array_unique($app['instrument']);
+            $found = true;
+            if (!empty($technology)) {
+                $result1 = array_intersect($technology, array_unique($app['functionality']));
+                $found = count($result1) > 0;
+            }
 
-            //print_r(sizeof($client2));
+            if (!empty($approaches)) {
+                $result2 = array_intersect($approaches, array_unique($app['approaches']));
+                $found *= count($result2) > 0;
+            }
 
-            $result1 = matchArray($client1, $server1);
-            $result2 = matchArray($client2, $server2);;
-            $result3 = matchArray($client3, $server3);;
+            if (!empty($instrument)) {
+                $result3 = array_intersect($instrument, array_unique($app['instrument']));
+                $found *= count($result3) > 0;
+            }
 
-            $result = $result1 + $result2 + $result3;
-
-            if($result > 0){
+            if ($found) {
                 $json['data'][] = $app;
             }
         }

@@ -18,8 +18,12 @@ switch ($_SERVER['REQUEST_METHOD']) {
             (isset($_GET['functionality']) && $_GET['functionality'] != "")
             || (isset($_GET['approaches']) && $_GET['approaches'] != "")
             || (isset($_GET['instrument']) && $_GET['instrument'] != "")
-        ){
-            getAppWithTechnology($_GET['functionality'], $_GET['approaches'], $_GET['instrument']);
+        ) {
+            getAppWithTechnology(
+                processParam($_GET['functionality']),
+                processParam($_GET['approaches']),
+                processParam($_GET['instrument'])
+            );
         } else {
             getAllApp();
         }
@@ -28,6 +32,15 @@ switch ($_SERVER['REQUEST_METHOD']) {
         print_r(json_encode(createEmptyJSONDataArray()));
 }
 
+function processParam($param)
+{
+    if ($param == "") {
+        $result = [];
+    } else {
+        $result = explode(" ", strtoupper(trim($param)));
+    }
+    return $result;
+}
 
 function getAllApp()
 {
@@ -63,25 +76,6 @@ function getAppWithTechnology($technology, $approaches, $instrument) {
 
     $json['result'] = 1;
     $json['data'] = [];
-
-    if($technology == ""){
-        $client1 = [];
-    } else {
-        $client1 = explode(" ", strtoupper($technology));
-    }
-
-
-    if($approaches == ""){
-        $client2 = [];
-    } else {
-        $client2 = explode(" ", strtoupper($approaches));
-    }
-
-    if($instrument == ""){
-        $client3 = [];
-    } else {
-        $client3 = explode(" ", strtoupper($instrument));
-    }
 
     foreach ($data['data'] as $appName){
 

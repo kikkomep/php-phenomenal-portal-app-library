@@ -31,19 +31,19 @@ to the `git clone` command.
 ## Changelog
 
 ##### Updates v1.1.0
-Update search functions to implement conjunctive queries
-Integrate `markdown2html` as a conversion tool 
-Add new script to convert markdown to HTML
+* Update search functions to implement conjunctive queries
+* Integrate `markdown2html` as a conversion tool 
+* Add new script to convert markdown to HTML
 
 ##### Updates v0.3.1
-Improve bash
-Add full text search
+* Improve bash
+* Add full text search
 
 ##### Updates v0.2.2
-Add query string to redirect pages
+* Add query string to redirect pages
 
 ##### Updates v0.2.1
-Production version
+* Production version
 
 ##### Updates v0.2
-Data can be pulled across and displayed
+* Data can be pulled across and displayed

@@ -1,5 +1,5 @@
 # App Library Backend
-Version 0.4.2
+Version 1.1.0
 
 ## Installation
 Make sure Python is install in the unix based system.
@@ -30,13 +30,9 @@ to the `git clone` command.
 
 ## Changelog
 
-##### Updates v0.4.2
+##### Updates v1.1.0
 Update search functions to implement conjunctive queries
-
-##### Updates v0.4.1
 Integrate `markdown2html` as a conversion tool 
-
-##### Updates v0.4.0
 Add new script to convert markdown to HTML
 
 ##### Updates v0.3.1
